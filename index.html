@@ -475,7 +475,8 @@
                     // 在手機上讓canvas更大，桌面上保持原來的邏輯
                     let scale;
                     if (window.innerWidth < 1024) { // 手機和平板
-                        scale = Math.min(rect.width / 600, rect.height / 600, 1.5); // 允許放大到1.5倍
+                        // 手機上盡可能充滿寬度，最大可放大到2.5倍
+                        scale = Math.min(rect.width / 600, 2.5);
                     } else { // 桌面
                         scale = Math.min(rect.width / 600, 1);
                     }
