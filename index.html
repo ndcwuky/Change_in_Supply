@@ -78,22 +78,22 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-6 max-w-6xl">
-        <!-- Language Switch and Title -->
-        <div class="text-center mb-8">
-            <!-- Language Switch Buttons -->
-            <div class="flex justify-center mb-6">
-                <div class="bg-white dark:bg-gray-800 rounded-lg p-1 shadow-md">
-                    <button id="langChinese" class="language-switch px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 bg-primary text-white chinese">
-                        中文
-                    </button>
-                    <button id="langEnglish" class="language-switch px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                        English
-                    </button>
-                </div>
+        <!-- Language Switch Buttons - Fixed in Top Right -->
+        <div class="fixed top-4 right-4 z-50" style="position: fixed !important; top: 16px !important; right: 16px !important;">
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-1 shadow-lg border border-gray-200 dark:border-gray-600">
+                <button id="langChinese" class="language-switch px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 bg-primary text-white chinese">
+                    中文
+                </button>
+                <button id="langEnglish" class="language-switch px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    English
+                </button>
             </div>
-            
-            <h1 id="mainTitle" class="text-3xl md:text-4xl font-bold mb-2 text-primary">供需均衡互動教學</h1>
-            <p id="mainSubtitle" class="text-lg text-gray-600 dark:text-gray-400">觀察供給變化對均衡價格和數量的影響</p>
+        </div>
+
+        <!-- Title -->
+        <div class="text-center mb-8 mt-16 md:mt-8 pr-4 md:pr-32">
+            <h1 id="mainTitle" class="text-2xl md:text-4xl font-bold mb-2 text-primary leading-tight">供需均衡互動教學</h1>
+            <p id="mainSubtitle" class="text-base md:text-lg text-gray-600 dark:text-gray-400 px-4">觀察供給變化對均衡價格和數量的影響</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -136,7 +136,7 @@
             <h2 id="quizTitle" class="text-xl font-semibold mb-6 text-center">📝 互動測驗</h2>
             
             <!-- Question 1 -->
-            <div class="mb-8">
+            <div class="mb-8 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800/30">
                 <h3 id="q1Title" class="text-lg font-medium mb-4">問題 1：當供給上升時，均衡價格和均衡數量會如何改變？</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
@@ -184,7 +184,7 @@
             </div>
 
             <!-- Question 3 -->
-            <div class="mb-8">
+            <div class="mb-8 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800/30">
                 <h3 id="q3Title" class="text-lg font-medium mb-4">問題 3：當物品X的生產成本下降，這對物品X的均衡價格和均衡數量有何影響呢？</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
@@ -232,7 +232,7 @@
             </div>
 
             <!-- Question 5 -->
-            <div class="mb-6">
+            <div class="mb-6 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800/30">
                 <h3 id="q5Title" class="text-lg font-medium mb-4">問題 5：物品X和物品Y是競爭供給，當物品X的價格下降時，這對物品Y的均衡價格和均衡數量有何影響呢？</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
