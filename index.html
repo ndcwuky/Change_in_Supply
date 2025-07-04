@@ -475,7 +475,8 @@
                     // 手機垂直模式下圖表加大一倍
                     let scale;
                     if (window.innerWidth < 768) { // 手機尺寸
-                        scale = Math.min(rect.width / 600, 2); // 最大可放大到2倍
+                        const baseScale = Math.min(rect.width / 600, 1);
+                        scale = baseScale * 2; // 在基礎縮放上再放大一倍
                     } else { // 平板和桌面
                         scale = Math.min(rect.width / 600, 1);
                     }
