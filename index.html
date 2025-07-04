@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supply and Demand Equilibrium Interactive Learning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+        }
+        
+        .chinese {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        
+        .dark {
+            color-scheme: dark;
+        }
+        
+        canvas {
+            border-radius: 8px;
+            background: white;
+        }
+        
+        .dark canvas {
+            background: #2d3748;
+        }
+        
+        .btn-primary {
+            background: #5D5CDE;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            background: #4c4bcc;
+            transform: translateY(-1px);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dark .card {
+            background: #2d3748;
+            border: 1px solid #4a5568;
+        }
+        
+        .animate-bounce-gentle {
+            animation: bounce-gentle 1s ease-in-out infinite;
+        }
+        
+        @keyframes bounce-gentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        .language-switch {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <!-- Language Switch and Title -->
+        <div class="text-center mb-8">
+            <!-- Language Switch Buttons -->
+            <div class="flex justify-center mb-6">
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-1 shadow-md">
+                    <button id="langChinese" class="language-switch px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 bg-primary text-white chinese">
+                        中文
+                    </button>
+                    <button id="langEnglish" class="language-switch px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        English
+                    </button>
+                </div>
+            </div>
+            
+            <h1 id="mainTitle" class="text-3xl md:text-4xl font-bold mb-2 text-primary">供需均衡互動教學</h1>
+            <p id="mainSubtitle" class="text-lg text-gray-600 dark:text-gray-400">觀察供給變化對均衡價格和數量的影響</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Control Panel -->
+            <div class="lg:col-span-1">
+                <div class="card p-6">
+                    <h2 id="controlTitle" class="text-xl font-semibold mb-4 text-center">控制面板</h2>
+                    
+                    <!-- Supply Adjustment -->
+                    <div class="mb-6">
+                        <label id="supplyLabel" class="block text-sm font-medium mb-3">供給曲線調整</label>
+                        <div class="space-y-3">
+                            <button id="increaseSupply" class="btn-primary text-white px-4 py-2 rounded-lg w-full text-base font-medium">
+                                <span id="increaseText">供給上升 ↗️</span>
+                            </button>
+                            <button id="decreaseSupply" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg w-full text-base font-medium transition-all duration-200">
+                                <span id="decreaseText">供給下降 ↘️</span>
+                            </button>
+                            <button id="resetSupply" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg w-full text-base font-medium transition-all duration-200">
+                                <span id="resetText">重設 🔄</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Area -->
+            <div class="lg:col-span-2">
+                <div class="card p-6">
+                    <h2 id="chartTitle" class="text-xl font-semibold mb-4 text-center">供需均衡圖</h2>
+                    <div class="relative">
+                        <canvas id="economicsChart" width="600" height="400" class="w-full max-w-full"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div class="mt-8 card p-6">
+            <h2 id="quizTitle" class="text-xl font-semibold mb-6 text-center">📝 互動測驗</h2>
+            
+            <!-- Question 1 -->
+            <div class="mb-8">
+                <h3 id="q1Title" class="text-lg font-medium mb-4">問題 1：當供給上升時，均衡價格和均衡數量會如何改變？</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q1" value="A" class="mr-3 text-primary">
+                        <span id="q1a" class="text-base">A. 均衡價格上升，均衡數量增加</span>
+                    </label>
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q1" value="B" class="mr-3 text-primary">
+                        <span id="q1b" class="text-base">B. 均衡價格下降，均衡數量減少</span>
+                    </label>
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q1" value="C" class="mr-3 text-primary">
+                        <span id="q1c" class="text-base">C. 均衡價格上升，均衡數量減少</span>
+                    </label>
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q1" value="D" class="mr-3 text-primary">
+                        <span id="q1d" class="text-base">D. 均衡價格下降，均衡數量增加</span>
+                    </label>
+                </div>
+                <div id="answer1" class="mt-4 p-4 rounded-lg hidden"></div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="mb-8">
+                <h3 id="q2Title" class="text-lg font-medium mb-4">問題 2：當供給下降時，均衡價格和均衡數量會如何改變？</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q2" value="A" class="mr-3 text-primary">
+                        <span id="q2a" class="text-base">A. 均衡價格上升，均衡數量減少</span>
+                    </label>
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q2" value="B" class="mr-3 text-primary">
+                        <span id="q2b" class="text-base">B. 均衡價格下降，均衡數量減少</span>
+                    </label>
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q2" value="C" class="mr-3 text-primary">
+                        <span id="q2c" class="text-base">C. 均衡價格上升，均衡數量增加</span>
+                    </label>
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q2" value="D" class="mr-3 text-primary">
+                        <span id="q2d" class="text-base">D. 均衡價格下降，均衡數量增加</span>
+                    </label>
+                </div>
+                <div id="answer2" class="mt-4 p-4 rounded-lg hidden"></div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="mb-8">
+                <h3 id="q3Title" class="text-lg font-medium mb-4">問題 3：當物品X的生產成本下降，這對物品X的均衡價格和均衡數量有何影響呢？</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q3" value="A" class="mr-3 text-primary">
+                        <span id="q3a" class="text-base">A. 均衡價格上升，均衡數量增加</span>
+                    </label>
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q3" value="B" class="mr-3 text-primary">
+                        <span id="q3b" class="text-base">B. 均衡價格下降，均衡數量減少</span>
+                    </label>
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q3" value="C" class="mr-3 text-primary">
+                        <span id="q3c" class="text-base">C. 均衡價格上升，均衡數量減少</span>
+                    </label>
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q3" value="D" class="mr-3 text-primary">
+                        <span id="q3d" class="text-base">D. 均衡價格下降，均衡數量增加</span>
+                    </label>
+                </div>
+                <div id="answer3" class="mt-4 p-4 rounded-lg hidden"></div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="mb-8">
+                <h3 id="q4Title" class="text-lg font-medium mb-4">問題 4：物品X和物品Y是聯合供給，當物品X的價格上升時，這對物品Y的均衡價格和均衡數量有何影響呢？</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q4" value="A" class="mr-3 text-primary">
+                        <span id="q4a" class="text-base">A. 均衡價格上升，均衡數量增加</span>
+                    </label>
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q4" value="B" class="mr-3 text-primary">
+                        <span id="q4b" class="text-base">B. 均衡價格下降，均衡數量減少</span>
+                    </label>
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q4" value="C" class="mr-3 text-primary">
+                        <span id="q4c" class="text-base">C. 均衡價格上升，均衡數量減少</span>
+                    </label>
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q4" value="D" class="mr-3 text-primary">
+                        <span id="q4d" class="text-base">D. 均衡價格下降，均衡數量增加</span>
+                    </label>
+                </div>
+                <div id="answer4" class="mt-4 p-4 rounded-lg hidden"></div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="mb-6">
+                <h3 id="q5Title" class="text-lg font-medium mb-4">問題 5：物品X和物品Y是競爭供給，當物品X的價格下降時，這對物品Y的均衡價格和均衡數量有何影響呢？</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q5" value="A" class="mr-3 text-primary">
+                        <span id="q5a" class="text-base">A. 均衡價格上升，均衡數量減少</span>
+                    </label>
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q5" value="B" class="mr-3 text-primary">
+                        <span id="q5b" class="text-base">B. 均衡價格下降，均衡數量減少</span>
+                    </label>
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q5" value="C" class="mr-3 text-primary">
+                        <span id="q5c" class="text-base">C. 均衡價格上升，均衡數量增加</span>
+                    </label>
+                    <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <input type="radio" name="q5" value="D" class="mr-3 text-primary">
+                        <span id="q5d" class="text-base">D. 均衡價格下降，均衡數量增加</span>
+                    </label>
+                </div>
+                <div id="answer5" class="mt-4 p-4 rounded-lg hidden"></div>
+            </div>
+        </div>
+
+        <!-- Explanation Section -->
+        <div class="mt-8 card p-6">
+            <h2 id="conceptTitle" class="text-xl font-semibold mb-4">經濟學概念說明</h2>
+            
+            <!-- Interactive Instructions -->
+            <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <h3 id="interactiveTitle" class="font-semibold text-blue-700 dark:text-blue-300 mb-2">📱 互動功能</h3>
+                <p id="interactiveText" class="text-sm text-blue-600 dark:text-blue-400">
+                    先點擊按鈕創建新的供給曲線（S₂），然後可以用滑鼠或手指直接拖動供給曲線上下移動，觀察均衡點的實時變化！
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                <div>
+                    <h3 id="supplyIncreaseTitle" class="font-semibold text-primary mb-2">供給上升的影響：</h3>
+                    <ul id="supplyIncreaseList" class="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400">
+                        <li>供給曲線向右下方移動</li>
+                        <li>均衡價格下降</li>
+                        <li>均衡數量增加</li>
+                        <li>市場出現短期供過於求</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 id="supplyDecreaseTitle" class="font-semibold text-red-500 mb-2">供給下降的影響：</h3>
+                    <ul id="supplyDecreaseList" class="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400">
+                        <li>供給曲線向左上方移動</li>
+                        <li>均衡價格上升</li>
+                        <li>均衡數量減少</li>
+                        <li>市場出現短期供不應求</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentLanguage = 'chinese';
+        let chart;
+
+        // Language content
+        const translations = {
+            chinese: {
+                mainTitle: "供需均衡互動教學",
+                mainSubtitle: "觀察供給變化對均衡價格和數量的影響",
+                controlTitle: "控制面板",
+                supplyLabel: "供給曲線調整",
+                increaseText: "供給上升 ↗️",
+                decreaseText: "供給下降 ↘️",
+                resetText: "重設 🔄",
+                chartTitle: "供需均衡圖",
+                quizTitle: "📝 互動測驗",
+                q1Title: "問題 1：當供給上升時，均衡價格和均衡數量會如何改變？",
+                q1a: "A. 均衡價格上升，均衡數量增加",
+                q1b: "B. 均衡價格下降，均衡數量減少",
+                q1c: "C. 均衡價格上升，均衡數量減少",
+                q1d: "D. 均衡價格下降，均衡數量增加",
+                q2Title: "問題 2：當供給下降時，均衡價格和均衡數量會如何改變？",
+                q2a: "A. 均衡價格上升，均衡數量減少",
+                q2b: "B. 均衡價格下降，均衡數量減少",
+                q2c: "C. 均衡價格上升，均衡數量增加",
+                q2d: "D. 均衡價格下降，均衡數量增加",
+                q3Title: "問題 3：當物品X的生產成本下降，這對物品X的均衡價格和均衡數量有何影響呢？",
+                q3a: "A. 均衡價格上升，均衡數量增加",
+                q3b: "B. 均衡價格下降，均衡數量減少",
+                q3c: "C. 均衡價格上升，均衡數量減少",
+                q3d: "D. 均衡價格下降，均衡數量增加",
+                q4Title: "問題 4：物品X和物品Y是聯合供給，當物品X的價格上升時，這對物品Y的均衡價格和均衡數量有何影響呢？",
+                q4a: "A. 均衡價格上升，均衡數量增加",
+                q4b: "B. 均衡價格下降，均衡數量減少",
+                q4c: "C. 均衡價格上升，均衡數量減少",
+                q4d: "D. 均衡價格下降，均衡數量增加",
+                q5Title: "問題 5：物品X和物品Y是競爭供給，當物品X的價格下降時，這對物品Y的均衡價格和均衡數量有何影響呢？",
+                q5a: "A. 均衡價格上升，均衡數量減少",
+                q5b: "B. 均衡價格下降，均衡數量減少",
+                q5c: "C. 均衡價格上升，均衡數量增加",
+                q5d: "D. 均衡價格下降，均衡數量增加",
+                conceptTitle: "經濟學概念說明",
+                interactiveTitle: "📱 互動功能",
+                interactiveText: "先點擊按鈕創建新的供給曲線（S₂），然後可以用滑鼠或手指直接拖動供給曲線上下移動，觀察均衡點的實時變化！",
+                supplyIncreaseTitle: "供給上升的影響：",
+                supplyDecreaseTitle: "供給下降的影響："
+            },
+            english: {
+                mainTitle: "Supply and Demand Equilibrium Interactive Learning",
+                mainSubtitle: "Observe how supply changes affect equilibrium price and quantity",
+                controlTitle: "Control Panel",
+                supplyLabel: "Supply Curve Adjustment",
+                increaseText: "Supply Increase ↗️",
+                decreaseText: "Supply Decrease ↘️",
+                resetText: "Reset 🔄",
+                chartTitle: "Supply and Demand Equilibrium Chart",
+                quizTitle: "📝 Interactive Quiz",
+                q1Title: "Question 1: When supply increases, how do equilibrium price and equilibrium quantity change?",
+                q1a: "A. Equilibrium price increases, equilibrium quantity increases",
+                q1b: "B. Equilibrium price decreases, equilibrium quantity decreases",
+                q1c: "C. Equilibrium price increases, equilibrium quantity decreases",
+                q1d: "D. Equilibrium price decreases, equilibrium quantity increases",
+                q2Title: "Question 2: When supply decreases, how do equilibrium price and equilibrium quantity change?",
+                q2a: "A. Equilibrium price increases, equilibrium quantity decreases",
+                q2b: "B. Equilibrium price decreases, equilibrium quantity decreases",
+                q2c: "C. Equilibrium price increases, equilibrium quantity increases",
+                q2d: "D. Equilibrium price decreases, equilibrium quantity increases",
+                q3Title: "Question 3: When the production cost of good X decreases, what effect does this have on the equilibrium price and equilibrium quantity of good X?",
+                q3a: "A. Equilibrium price increases, equilibrium quantity increases",
+                q3b: "B. Equilibrium price decreases, equilibrium quantity decreases",
+                q3c: "C. Equilibrium price increases, equilibrium quantity decreases",
+                q3d: "D. Equilibrium price decreases, equilibrium quantity increases",
+                q4Title: "Question 4: Good X and good Y are joint supply. When the price of good X increases, what effect does this have on the equilibrium price and equilibrium quantity of good Y?",
+                q4a: "A. Equilibrium price increases, equilibrium quantity increases",
+                q4b: "B. Equilibrium price decreases, equilibrium quantity decreases",
+                q4c: "C. Equilibrium price increases, equilibrium quantity decreases",
+                q4d: "D. Equilibrium price decreases, equilibrium quantity increases",
+                q5Title: "Question 5: Good X and good Y are competitive supply. When the price of good X decreases, what effect does this have on the equilibrium price and equilibrium quantity of good Y?",
+                q5a: "A. Equilibrium price increases, equilibrium quantity decreases",
+                q5b: "B. Equilibrium price decreases, equilibrium quantity decreases",
+                q5c: "C. Equilibrium price increases, equilibrium quantity increases",
+                q5d: "D. Equilibrium price decreases, equilibrium quantity increases",
+                conceptTitle: "Economic Concepts Explanation",
+                interactiveTitle: "📱 Interactive Features",
+                interactiveText: "First click the button to create a new supply curve (S₂), then you can directly drag the supply curve up and down with your mouse or finger to observe real-time changes in the equilibrium point!",
+                supplyIncreaseTitle: "Effects of Supply Increase:",
+                supplyDecreaseTitle: "Effects of Supply Decrease:"
+            }
+        };
+
+        // Language switching function
+        function switchLanguage(lang) {
+            console.log('Switching to:', lang);
+            currentLanguage = lang;
+
+            // Update button states
+            const chineseBtn = document.getElementById('langChinese');
+            const englishBtn = document.getElementById('langEnglish');
+
+            if (lang === 'chinese') {
+                chineseBtn.className = 'language-switch px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 bg-primary text-white chinese';
+                englishBtn.className = 'language-switch px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700';
+                document.body.classList.add('chinese');
+            } else {
+                englishBtn.className = 'language-switch px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 bg-primary text-white';
+                chineseBtn.className = 'language-switch px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 chinese';
+                document.body.classList.remove('chinese');
+            }
+
+            // Update text content
+            const langContent = translations[lang];
+            Object.keys(langContent).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.textContent = langContent[key];
+                }
+            });
+
+            // Update lists
+            const supplyIncreaseItems = lang === 'chinese' ? [
+                "供給曲線向右下方移動", "均衡價格下降", "均衡數量增加", "市場出現短期供過於求"
+            ] : [
+                "Supply curve shifts rightward and downward", "Equilibrium price decreases", "Equilibrium quantity increases", "Market experiences short-term oversupply"
+            ];
+
+            const supplyDecreaseItems = lang === 'chinese' ? [
+                "供給曲線向左上方移動", "均衡價格上升", "均衡數量減少", "市場出現短期供不應求"
+            ] : [
+                "Supply curve shifts leftward and upward", "Equilibrium price increases", "Equilibrium quantity decreases", "Market experiences short-term shortage"
+            ];
+
+            document.getElementById('supplyIncreaseList').innerHTML = supplyIncreaseItems.map(item => `<li>${item}</li>`).join('');
+            document.getElementById('supplyDecreaseList').innerHTML = supplyDecreaseItems.map(item => `<li>${item}</li>`).join('');
+
+            // Redraw chart with new language
+            if (chart) {
+                chart.draw();
+            }
+        }
+
+        // Dark mode setup
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Economics Chart Class
+        class EconomicsChart {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.width = this.canvas.width;
+                this.height = this.canvas.height;
+                
+                this.supplyShift = 0;
+                this.margin = 60;
+                this.chartWidth = this.width - 2 * this.margin;
+                this.chartHeight = this.height - 2 * this.margin;
+                
+                this.isDragging = false;
+                this.isHovering = false;
+                this.dragStartY = 0;
+                this.initialShift = 0;
+                
+                this.setupEventListeners();
+                this.setupInteractionListeners();
+                this.draw();
+            }
+            
+            setupEventListeners() {
+                const resizeCanvas = () => {
+                    const container = this.canvas.parentElement;
+                    const rect = container.getBoundingClientRect();
+                    const scale = Math.min(rect.width / 600, 1);
+                    this.canvas.style.transform = `scale(${scale})`;
+                    this.canvas.style.transformOrigin = 'top left';
+                };
+                
+                window.addEventListener('resize', resizeCanvas);
+                resizeCanvas();
+            }
+            
+            supplyFunction(quantity) {
+                return 5 + 0.05 * quantity;
+            }
+            
+            originalSupplyFunction(quantity) {
+                return 5 + 0.05 * quantity;
+            }
+            
+            demandFunction(quantity) {
+                return 15 - 0.05 * quantity;
+            }
+            
+            newSupplyFunction(quantity) {
+                return 5 + 0.05 * quantity + this.supplyShift;
+            }
+            
+            calculateOriginalEquilibrium() {
+                const equilibriumQuantity = 100;
+                const equilibriumPrice = this.supplyFunction(equilibriumQuantity);
+                return { quantity: equilibriumQuantity, price: equilibriumPrice };
+            }
+            
+            calculateNewEquilibrium() {
+                const equilibriumQuantity = (10 - this.supplyShift) / 0.1;
+                const equilibriumPrice = this.demandFunction(equilibriumQuantity);
+                return { quantity: equilibriumQuantity, price: equilibriumPrice };
+            }
+            
+            toCanvasX(quantity) {
+                return this.margin + (quantity / 200) * this.chartWidth;
+            }
+            
+            toCanvasY(price) {
+                return this.height - this.margin - ((price - 0) / 20) * this.chartHeight;
+            }
+            
+            draw() {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                
+                const isDark = document.documentElement.classList.contains('dark');
+                const textColor = isDark ? '#e2e8f0' : '#374151';
+                const gridColor = isDark ? '#4a5568' : '#d1d5db';
+                const axisColor = isDark ? '#718096' : '#6b7280';
+                
+                this.drawAxes(textColor, axisColor);
+                this.drawGrid(gridColor);
+                this.drawSupplyCurve();
+                this.drawDemandCurve();
+                this.drawEquilibrium();
+            }
+            
+            drawAxes(textColor, axisColor) {
+                this.ctx.strokeStyle = axisColor;
+                this.ctx.lineWidth = 2;
+                this.ctx.font = currentLanguage === 'chinese' ? '14px Noto Sans TC' : '14px Inter';
+                this.ctx.fillStyle = textColor;
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.margin, this.height - this.margin);
+                this.ctx.lineTo(this.width - this.margin, this.height - this.margin);
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.margin, this.margin);
+                this.ctx.lineTo(this.margin, this.height - this.margin);
+                this.ctx.stroke();
+                
+                this.ctx.textAlign = 'center';
+                const quantityLabel = currentLanguage === 'chinese' ? '數量 (Quantity)' : 'Quantity';
+                this.ctx.fillText(quantityLabel, this.width - this.margin - 20, this.height - 20);
+                
+                this.ctx.textAlign = 'left';
+                const priceLabel = currentLanguage === 'chinese' ? '價格 (Price)' : 'Price';
+                this.ctx.fillText(priceLabel, 15, 25);
+            }
+            
+            drawGrid(gridColor) {
+                this.ctx.strokeStyle = gridColor;
+                this.ctx.lineWidth = 0.3;
+                
+                for (let q = 0; q <= 200; q += 50) {
+                    const x = this.toCanvasX(q);
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, this.margin);
+                    this.ctx.lineTo(x, this.height - this.margin);
+                    this.ctx.stroke();
+                }
+                
+                for (let p = 0; p <= 20; p += 5) {
+                    const y = this.toCanvasY(p);
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(this.margin, y);
+                    this.ctx.lineTo(this.width - this.margin, y);
+                    this.ctx.stroke();
+                }
+            }
+            
+            drawSupplyCurve() {
+                this.ctx.strokeStyle = '#ef4444';
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                
+                for (let q = 0; q <= 200; q += 1) {
+                    const price = this.originalSupplyFunction(q);
+                    const x = this.toCanvasX(q);
+                    const y = this.toCanvasY(price);
+                    
+                    if (q === 0) {
+                        this.ctx.moveTo(x, y);
+                    } else {
+                        this.ctx.lineTo(x, y);
+                    }
+                }
+                this.ctx.stroke();
+                
+                if (this.supplyShift !== 0) {
+                    this.ctx.strokeStyle = '#dc2626';
+                    this.ctx.lineWidth = 3;
+                    this.ctx.beginPath();
+                    
+                    for (let q = 0; q <= 200; q += 1) {
+                        const price = this.newSupplyFunction(q);
+                        if (price < 0 || price > 20) continue;
+                        
+                        const x = this.toCanvasX(q);
+                        const y = this.toCanvasY(price);
+                        
+                        if (q === 0) {
+                            this.ctx.moveTo(x, y);
+                        } else {
+                            this.ctx.lineTo(x, y);
+                        }
+                    }
+                    this.ctx.stroke();
+                }
+                
+                const s1EndQ = 190;
+                const s1EndPrice = this.originalSupplyFunction(s1EndQ);
+                const s1EndX = this.toCanvasX(s1EndQ);
+                const s1EndY = this.toCanvasY(s1EndPrice);
+                
+                this.ctx.fillStyle = '#ef4444';
+                this.ctx.font = currentLanguage === 'chinese' ? 'bold 18px Noto Sans TC' : 'bold 18px Inter';
+                this.ctx.fillText('S₁', s1EndX + 10, s1EndY - 8);
+                
+                if (this.supplyShift !== 0) {
+                    const s2EndQ = 190;
+                    const s2EndPrice = this.newSupplyFunction(s2EndQ);
+                    if (s2EndPrice > 0 && s2EndPrice <= 20) {
+                        const s2EndX = this.toCanvasX(s2EndQ);
+                        const s2EndY = this.toCanvasY(s2EndPrice);
+                        
+                        this.ctx.fillStyle = '#dc2626';
+                        this.ctx.fillText('S₂', s2EndX + 10, s2EndY - 8);
+                    }
+                }
+            }
+            
+            drawDemandCurve() {
+                this.ctx.strokeStyle = '#3b82f6';
+                this.ctx.lineWidth = 3;
+                this.ctx.beginPath();
+                
+                for (let q = 0; q <= 200; q += 1) {
+                    const price = this.demandFunction(q);
+                    if (price < 0) continue;
+                    
+                    const x = this.toCanvasX(q);
+                    const y = this.toCanvasY(price);
+                    
+                    if (q === 0) {
+                        this.ctx.moveTo(x, y);
+                    } else {
+                        this.ctx.lineTo(x, y);
+                    }
+                }
+                this.ctx.stroke();
+                
+                const dEndQ = 200;
+                const dEndPrice = this.demandFunction(dEndQ);
+                if (dEndPrice > 0) {
+                    const dEndX = this.toCanvasX(dEndQ);
+                    const dEndY = this.toCanvasY(dEndPrice);
+                    
+                    this.ctx.fillStyle = '#3b82f6';
+                    this.ctx.font = currentLanguage === 'chinese' ? 'bold 18px Noto Sans TC' : 'bold 18px Inter';
+                    this.ctx.fillText('D', dEndX + 10, dEndY + 5);
+                }
+            }
+            
+            drawEquilibrium() {
+                const originalEq = this.calculateOriginalEquilibrium();
+                const originalX = this.toCanvasX(originalEq.quantity);
+                const originalY = this.toCanvasY(originalEq.price);
+                
+                this.ctx.strokeStyle = '#9ca3af';
+                this.ctx.lineWidth = 1;
+                this.ctx.setLineDash([4, 4]);
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.margin, originalY);
+                this.ctx.lineTo(originalX, originalY);
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(originalX, originalY);
+                this.ctx.lineTo(originalX, this.height - this.margin);
+                this.ctx.stroke();
+                
+                this.ctx.setLineDash([]);
+                
+                this.ctx.fillStyle = '#6b7280';
+                this.ctx.strokeStyle = '#374151';
+                this.ctx.lineWidth = 3;
+                this.ctx.beginPath();
+                this.ctx.arc(originalX, originalY, 7, 0, 2 * Math.PI);
+                this.ctx.fill();
+                this.ctx.stroke();
+                
+                this.ctx.font = currentLanguage === 'chinese' ? 'bold 14px Noto Sans TC' : 'bold 14px Inter';
+                this.ctx.fillStyle = '#9ca3af';
+                this.ctx.fillText('P₁', this.margin - 25, originalY + 4);
+                this.ctx.fillText('Q₁', originalX - 8, this.height - this.margin + 20);
+                
+                if (this.supplyShift !== 0) {
+                    const newEq = this.calculateNewEquilibrium();
+                    const newX = this.toCanvasX(newEq.quantity);
+                    const newY = this.toCanvasY(newEq.price);
+                    
+                    this.ctx.strokeStyle = '#ef4444';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.setLineDash([6, 3]);
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(this.margin, newY);
+                    this.ctx.lineTo(newX, newY);
+                    this.ctx.stroke();
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(newX, newY);
+                    this.ctx.lineTo(newX, this.height - this.margin);
+                    this.ctx.stroke();
+                    
+                    this.ctx.setLineDash([]);
+                    
+                    this.ctx.fillStyle = '#3b82f6';
+                    this.ctx.strokeStyle = '#2563eb';
+                    this.ctx.lineWidth = 3;
+                    this.ctx.beginPath();
+                    this.ctx.arc(newX, newY, 7, 0, 2 * Math.PI);
+                    this.ctx.fill();
+                    this.ctx.stroke();
+                    
+                    this.ctx.fillStyle = '#ef4444';
+                    this.ctx.font = currentLanguage === 'chinese' ? 'bold 14px Noto Sans TC' : 'bold 14px Inter';
+                    this.ctx.fillText('P₂', this.margin - 25, newY + 4);
+                    this.ctx.fillText('Q₂', newX - 8, this.height - this.margin + 20);
+                    
+                    this.drawArrows(originalEq, newEq, originalX, originalY, newX, newY);
+                }
+            }
+            
+            drawArrows(originalEq, newEq, originalX, originalY, newX, newY) {
+                this.ctx.strokeStyle = '#f97316';
+                this.ctx.fillStyle = '#f97316';
+                this.ctx.lineWidth = 3;
+                
+                const arrowPrice = 12;
+                const arrowY = this.toCanvasY(arrowPrice);
+                
+                const s1Quantity = (arrowPrice - 5) / 0.05;
+                const s2Quantity = (arrowPrice - 5 - this.supplyShift) / 0.05;
+                
+                const s1X = this.toCanvasX(s1Quantity);
+                const s2X = this.toCanvasX(s2Quantity);
+                
+                if (Math.abs(s2X - s1X) > 10) {
+                    const centerX = (s1X + s2X) / 2;
+                    const arrowLength = 60;
+                    const direction = s2X > s1X ? 1 : -1;
+                    
+                    const arrowStartX = centerX - direction * arrowLength / 2;
+                    const arrowEndX = centerX + direction * arrowLength / 2;
+                    
+                    this.drawArrow(arrowStartX, arrowY, arrowEndX, arrowY);
+                }
+                
+                this.drawArrow(this.margin - 45, originalY, this.margin - 45, newY);
+                this.drawArrow(originalX, this.height - this.margin + 35, newX, this.height - this.margin + 35);
+            }
+            
+            drawArrow(startX, startY, endX, endY) {
+                const headlen = 12;
+                const angle = Math.atan2(endY - startY, endX - startX);
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(startX, startY);
+                this.ctx.lineTo(endX, endY);
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(endX, endY);
+                this.ctx.lineTo(endX - headlen * Math.cos(angle - Math.PI / 6), endY - headlen * Math.sin(angle - Math.PI / 6));
+                this.ctx.lineTo(endX - headlen * Math.cos(angle + Math.PI / 6), endY - headlen * Math.sin(angle + Math.PI / 6));
+                this.ctx.closePath();
+                this.ctx.fill();
+                this.ctx.stroke();
+            }
+            
+            increaseSupply() {
+                this.supplyShift -= 3;
+                this.animateDraw();
+            }
+            
+            decreaseSupply() {
+                this.supplyShift += 3;
+                this.animateDraw();
+            }
+            
+            resetSupply() {
+                this.supplyShift = 0;
+                this.animateDraw();
+            }
+            
+            animateDraw() {
+                this.canvas.style.transform += ' scale(1.02)';
+                setTimeout(() => {
+                    this.canvas.style.transform = this.canvas.style.transform.replace(' scale(1.02)', '');
+                    this.draw();
+                }, 100);
+                
+                this.draw();
+            }
+            
+            setupInteractionListeners() {
+                this.canvas.addEventListener('mousedown', (e) => this.handleStart(e));
+                this.canvas.addEventListener('mousemove', (e) => this.handleMove(e));
+                this.canvas.addEventListener('mouseup', (e) => this.handleEnd(e));
+                this.canvas.addEventListener('mouseleave', (e) => this.handleEnd(e));
+                
+                this.canvas.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.handleStart(e.touches[0]);
+                });
+                this.canvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    this.handleMove(e.touches[0]);
+                });
+                this.canvas.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.handleEnd(e);
+                });
+                
+                this.canvas.addEventListener('mousemove', (e) => {
+                    if (!this.isDragging) {
+                        this.updateCursor(e);
+                    }
+                });
+            }
+            
+            getEventPos(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const scaleX = this.canvas.width / rect.width;
+                const scaleY = this.canvas.height / rect.height;
+                
+                return {
+                    x: (e.clientX - rect.left) * scaleX,
+                    y: (e.clientY - rect.top) * scaleY
+                };
+            }
+            
+            isNearSupplyCurve(pos) {
+                if (this.supplyShift === 0) return false;
+                
+                const tolerance = 15;
+                
+                if (pos.x < this.margin || pos.x > this.width - this.margin) return false;
+                if (pos.y < this.margin || pos.y > this.height - this.margin) return false;
+                
+                const quantity = ((pos.x - this.margin) / this.chartWidth) * 200;
+                const price = ((this.height - this.margin - pos.y) / this.chartHeight) * 20;
+                
+                const supplyPrice = this.newSupplyFunction(quantity);
+                
+                return Math.abs(price - supplyPrice) < tolerance * (20 / this.chartHeight);
+            }
+            
+            handleStart(e) {
+                const pos = this.getEventPos(e);
+                
+                if (this.isNearSupplyCurve(pos)) {
+                    this.isDragging = true;
+                    this.dragStartY = pos.y;
+                    this.initialShift = this.supplyShift;
+                    this.canvas.style.cursor = 'grabbing';
+                }
+            }
+            
+            handleMove(e) {
+                const pos = this.getEventPos(e);
+                
+                if (this.isDragging) {
+                    const deltaY = this.dragStartY - pos.y;
+                    const priceChange = (deltaY / this.chartHeight) * 20;
+                    
+                    this.supplyShift = Math.max(-10, Math.min(10, this.initialShift + priceChange));
+                    
+                    this.draw();
+                }
+            }
+            
+            handleEnd(e) {
+                if (this.isDragging) {
+                    this.isDragging = false;
+                    this.canvas.style.cursor = 'default';
+                }
+            }
+            
+            updateCursor(e) {
+                const pos = this.getEventPos(e);
+                
+                if (this.isNearSupplyCurve(pos)) {
+                    this.canvas.style.cursor = 'grab';
+                    this.isHovering = true;
+                } else {
+                    this.canvas.style.cursor = 'default';
+                    this.isHovering = false;
+                }
+            }
+        }
+
+        // Quiz functionality
+        function setupQuiz() {
+            // Question answers for each language
+            const quizAnswers = {
+                chinese: {
+                    q1: {
+                        correct: '<div class="flex items-start"><span class="text-green-600 dark:text-green-400 mr-2">✅</span><div><strong class="text-green-700 dark:text-green-300">正確！</strong><br><span class="text-green-600 dark:text-green-400 text-sm">當供給上升時，供給曲線向右下方移動，與需求曲線的交點右移下移，導致均衡價格下降，均衡數量增加。</span></div></div>',
+                        wrongA: "供給上升會使價格下降，而不是上升。",
+                        wrongB: "供給上升會使數量增加，而不是減少。",
+                        wrongC: "供給上升會使價格下降且數量增加，而不是價格上升數量減少。"
+                    },
+                    q2: {
+                        correct: '<div class="flex items-start"><span class="text-green-600 dark:text-green-400 mr-2">✅</span><div><strong class="text-green-700 dark:text-green-300">正確！</strong><br><span class="text-green-600 dark:text-green-400 text-sm">當供給下降時，供給曲線向左上方移動，與需求曲線的交點左移上移，導致均衡價格上升，均衡數量減少。</span></div></div>',
+                        wrongB: "供給下降會使價格上升，而不是下降。",
+                        wrongC: "供給下降會使數量減少，而不是增加。",
+                        wrongD: "供給下降會使價格上升且數量減少，而不是價格下降數量增加。"
+                    },
+                    q3: {
+                        correct: '<div class="flex items-start"><span class="text-green-600 dark:text-green-400 mr-2">✅</span><div><strong class="text-green-700 dark:text-green-300">正確！</strong><br><span class="text-green-600 dark:text-green-400 text-sm">當生產成本下降時，生產者願意以更低的價格提供更多商品，這等同於供給上升。供給曲線向右下方移動，導致均衡價格下降，均衡數量增加。</span></div></div>',
+                        wrongA: "生產成本下降會使供給增加，導致價格下降，而不是上升。",
+                        wrongB: "生產成本下降會使供給增加，導致數量增加，而不是減少。",
+                        wrongC: "生產成本下降會使供給增加，導致價格下降且數量增加，而不是價格上升數量減少。"
+                    },
+                    q4: {
+                        correct: '<div class="flex items-start"><span class="text-green-600 dark:text-green-400 mr-2">✅</span><div><strong class="text-green-700 dark:text-green-300">正確！</strong><br><span class="text-green-600 dark:text-green-400 text-sm">當X的價格上升時，生產者會增加X的生產。由於X和Y是聯合供給（如牛肉和牛皮），增加X的生產會同時增加Y的供給，導致Y的均衡價格下降，均衡數量增加。</span></div></div>',
+                        wrongA: "聯合供給中，當X價格上升會增加Y的供給，導致Y的價格下降，而不是上升。",
+                        wrongB: "聯合供給中，當X價格上升會增加Y的供給，導致Y的數量增加，而不是減少。",
+                        wrongC: "聯合供給中，當X價格上升會增加Y的供給，導致Y的價格下降且數量增加，而不是價格上升數量減少。"
+                    },
+                    q5: {
+                        correct: '<div class="flex items-start"><span class="text-green-600 dark:text-green-400 mr-2">✅</span><div><strong class="text-green-700 dark:text-green-300">正確！</strong><br><span class="text-green-600 dark:text-green-400 text-sm">當X的價格下降時，生產者會減少X的生產，轉而增加Y的生產。由於X和Y是競爭供給（如小麥和玉米），資源轉向Y會增加Y的供給，導致Y的均衡價格下降，均衡數量增加。</span></div></div>',
+                        wrongA: "競爭供給中，當X價格下降會增加Y的供給，導致Y的價格下降，而不是上升。",
+                        wrongB: "競爭供給中，當X價格下降會增加Y的供給，導致Y的數量增加，而不是減少。",
+                        wrongC: "競爭供給中，當X價格下降會增加Y的供給，導致Y的價格下降且數量增加，而不是價格上升數量增加。"
+                    }
+                },
+                english: {
+                    q1: {
+                        correct: '<div class="flex items-start"><span class="text-green-600 dark:text-green-400 mr-2">✅</span><div><strong class="text-green-700 dark:text-green-300">Correct!</strong><br><span class="text-green-600 dark:text-green-400 text-sm">When supply increases, the supply curve shifts rightward and downward, causing the intersection with the demand curve to move right and down, resulting in decreased equilibrium price and increased equilibrium quantity.</span></div></div>',
+                        wrongA: "Supply increase causes price to decrease, not increase.",
+                        wrongB: "Supply increase causes quantity to increase, not decrease.",
+                        wrongC: "Supply increase causes price to decrease and quantity to increase, not price increase and quantity decrease."
+                    },
+                    q2: {
+                        correct: '<div class="flex items-start"><span class="text-green-600 dark:text-green-400 mr-2">✅</span><div><strong class="text-green-700 dark:text-green-300">Correct!</strong><br><span class="text-green-600 dark:text-green-400 text-sm">When supply decreases, the supply curve shifts leftward and upward, causing the intersection with the demand curve to move left and up, resulting in increased equilibrium price and decreased equilibrium quantity.</span></div></div>',
+                        wrongB: "Supply decrease causes price to increase, not decrease.",
+                        wrongC: "Supply decrease causes quantity to decrease, not increase.",
+                        wrongD: "Supply decrease causes price to increase and quantity to decrease, not price decrease and quantity increase."
+                    },
+                    q3: {
+                        correct: '<div class="flex items-start"><span class="text-green-600 dark:text-green-400 mr-2">✅</span><div><strong class="text-green-700 dark:text-green-300">Correct!</strong><br><span class="text-green-600 dark:text-green-400 text-sm">When production costs decrease, producers are willing to supply more goods at lower prices, which is equivalent to a supply increase. The supply curve shifts rightward and downward, resulting in decreased equilibrium price and increased equilibrium quantity.</span></div></div>',
+                        wrongA: "Decreased production costs increase supply, leading to price decrease, not increase.",
+                        wrongB: "Decreased production costs increase supply, leading to quantity increase, not decrease.",
+                        wrongC: "Decreased production costs increase supply, leading to price decrease and quantity increase, not price increase and quantity decrease."
+                    },
+                    q4: {
+                        correct: '<div class="flex items-start"><span class="text-green-600 dark:text-green-400 mr-2">✅</span><div><strong class="text-green-700 dark:text-green-300">Correct!</strong><br><span class="text-green-600 dark:text-green-400 text-sm">When the price of X increases, producers will increase production of X. Since X and Y are joint supply (like beef and leather), increasing X production simultaneously increases Y supply, resulting in decreased equilibrium price and increased equilibrium quantity of Y.</span></div></div>',
+                        wrongA: "In joint supply, when X price increases, Y supply increases, causing Y price to decrease, not increase.",
+                        wrongB: "In joint supply, when X price increases, Y supply increases, causing Y quantity to increase, not decrease.",
+                        wrongC: "In joint supply, when X price increases, Y supply increases, causing Y price to decrease and quantity to increase, not price increase and quantity decrease."
+                    },
+                    q5: {
+                        correct: '<div class="flex items-start"><span class="text-green-600 dark:text-green-400 mr-2">✅</span><div><strong class="text-green-700 dark:text-green-300">Correct!</strong><br><span class="text-green-600 dark:text-green-400 text-sm">When the price of X decreases, producers will reduce X production and shift to producing more Y. Since X and Y are competitive supply (like wheat and corn), resources shifting to Y increases Y supply, resulting in decreased equilibrium price and increased equilibrium quantity of Y.</span></div></div>',
+                        wrongA: "In competitive supply, when X price decreases, Y supply increases, causing Y price to decrease, not increase.",
+                        wrongB: "In competitive supply, when X price decreases, Y supply increases, causing Y quantity to increase, not decrease.",
+                        wrongC: "In competitive supply, when X price decreases, Y supply increases, causing Y price to decrease and quantity to increase, not price increase and quantity increase."
+                    }
+                }
+            };
+
+            for (let i = 1; i <= 5; i++) {
+                const inputs = document.querySelectorAll(`input[name="q${i}"]`);
+                inputs.forEach(input => {
+                    input.addEventListener('change', function() {
+                        const answerDiv = document.getElementById(`answer${i}`);
+                        answerDiv.classList.remove('hidden');
+                        
+                        const correctAnswers = ['D', 'A', 'D', 'D', 'D'];
+                        const isCorrect = this.value === correctAnswers[i - 1];
+                        
+                        if (isCorrect) {
+                            answerDiv.className = 'mt-4 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800';
+                            answerDiv.innerHTML = quizAnswers[currentLanguage][`q${i}`].correct;
+                        } else {
+                            answerDiv.className = 'mt-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800';
+                            const wrongKey = `wrong${this.value}`;
+                            const explanation = quizAnswers[currentLanguage][`q${i}`][wrongKey];
+                            const incorrectText = currentLanguage === 'chinese' ? '錯誤。' : 'Incorrect.';
+                            answerDiv.innerHTML = `<div class="flex items-start"><span class="text-red-600 dark:text-red-400 mr-2">❌</span><div><strong class="text-red-700 dark:text-red-300">${incorrectText}</strong><br><span class="text-red-600 dark:text-red-400 text-sm">${explanation}</span></div></div>`;
+                        }
+                    });
+                });
+            }
+        }
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            chart = new EconomicsChart('economicsChart');
+            
+            document.getElementById('increaseSupply').addEventListener('click', () => {
+                chart.increaseSupply();
+            });
+            
+            document.getElementById('decreaseSupply').addEventListener('click', () => {
+                chart.decreaseSupply();
+            });
+            
+            document.getElementById('resetSupply').addEventListener('click', () => {
+                chart.resetSupply();
+            });
+            
+            // Language switch events
+            document.getElementById('langChinese').addEventListener('click', function() {
+                console.log('Chinese clicked');
+                switchLanguage('chinese');
+            });
+            
+            document.getElementById('langEnglish').addEventListener('click', function() {
+                console.log('English clicked');
+                switchLanguage('english');
+            });
+            
+            setupQuiz();
+        });
+    </script>
+</body>
+</html>
