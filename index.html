@@ -471,7 +471,15 @@
                 const resizeCanvas = () => {
                     const container = this.canvas.parentElement;
                     const rect = container.getBoundingClientRect();
-                    const scale = Math.min(rect.width / 600, 1);
+                    
+                    // 手機垂直模式下圖表加大一倍
+                    let scale;
+                    if (window.innerWidth < 768) { // 手機尺寸
+                        scale = Math.min(rect.width / 600, 2); // 最大可放大到2倍
+                    } else { // 平板和桌面
+                        scale = Math.min(rect.width / 600, 1);
+                    }
+                    
                     this.canvas.style.transform = `scale(${scale})`;
                     this.canvas.style.transformOrigin = 'top left';
                 };
