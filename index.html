@@ -96,23 +96,23 @@
             <p id="mainSubtitle" class="text-base md:text-lg text-gray-600 dark:text-gray-400 px-4">觀察供給變化對均衡價格和數量的影響</p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <!-- Control Panel -->
-            <div class="lg:col-span-1">
-                <div class="card p-6">
+            <div class="lg:col-span-1 order-1 lg:order-1">
+                <div class="card p-4 lg:p-6">
                     <h2 id="controlTitle" class="text-xl font-semibold mb-4 text-center">控制面板</h2>
                     
                     <!-- Supply Adjustment -->
                     <div class="mb-6">
                         <label id="supplyLabel" class="block text-sm font-medium mb-3">供給曲線調整</label>
-                        <div class="space-y-3">
-                            <button id="increaseSupply" class="btn-primary text-white px-4 py-2 rounded-lg w-full text-base font-medium">
+                        <div class="grid grid-cols-3 lg:grid-cols-1 gap-3">
+                            <button id="increaseSupply" class="btn-primary text-white px-4 py-2 rounded-lg text-base font-medium">
                                 <span id="increaseText">供給上升 ↗️</span>
                             </button>
-                            <button id="decreaseSupply" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg w-full text-base font-medium transition-all duration-200">
+                            <button id="decreaseSupply" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-base font-medium transition-all duration-200">
                                 <span id="decreaseText">供給下降 ↘️</span>
                             </button>
-                            <button id="resetSupply" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg w-full text-base font-medium transition-all duration-200">
+                            <button id="resetSupply" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-base font-medium transition-all duration-200">
                                 <span id="resetText">重設 🔄</span>
                             </button>
                         </div>
@@ -121,8 +121,8 @@
             </div>
 
             <!-- Chart Area -->
-            <div class="lg:col-span-2">
-                <div class="card p-6">
+            <div class="lg:col-span-3 order-2 lg:order-2">
+                <div class="card p-4 lg:p-6">
                     <h2 id="chartTitle" class="text-xl font-semibold mb-4 text-center">供需均衡圖</h2>
                     <div class="relative">
                         <canvas id="economicsChart" width="600" height="400" class="w-full max-w-full"></canvas>
